@@ -1,0 +1,32 @@
+var app = require('../app');
+var models = require('../models');
+
+
+app.set('port', process.env.PORT || 3000);
+
+models.sequelize.sync({force:true}).then(function(){
+	return models.Consola.create({nombre:'Playstation 4', descripcion:'Es negra'})
+}).then(function(consola){
+	return models.Juego.bulkCreate([
+		{nombre:'Metal Gear Solid V', descripcion:'Este es el mejor juego del año', ConsolaId:consola.id},
+		{nombre:'Fifa 16', ConsolaId:consola.id},
+		{nombre:'Pro Evolution Soccer 2016', descripcion:'Este es el mejor juego del año', ConsolaId:consola.id},
+		{nombre:'Raw vs Smackdown 2016', ConsolaId:consola.id},
+		{nombre:'Little Big Planet', descripcion:'Este es el mejor juego del año', ConsolaId:consola.id},
+		{nombre:'Call of Duty: Black Ops 3', ConsolaId:consola.id}
+	])
+}).then(function(){
+	return models.Consola.create({nombre:'Wii U', descripcion:'Es blanca'})
+}).then(function(consola){
+	return models.Juego.create({
+		nombre:'New Super Mario Bros', descripcion:'Es multijugador', ConsolaId:consola.id
+	}).then(function(juego){
+		return models.Usuario.create({email:'mjvr4@alu.ua.es', nombre:'Manuel', apellidos:'Verdu', direccion:'Avenida Pais Valenciano'}).then(function(user){
+			user.addJuego(juego);
+		});
+	})
+}).then(function(){
+	app.listen(app.get('port'), function(){
+		console.log('Express en el puerto '+app.get('port'));
+	})
+});
